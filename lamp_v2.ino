@@ -3,15 +3,15 @@
 #include <OneButton.h>
 MicroDS3231 rtc;
 
-
 #define LEDC_TIMER_12_BIT 12
 #define LEDC_BASE_FREQ 5000
 #define LED_PIN 0
+#define BUTTON_PIN 1
 #define LED_IND_PIN 2
-#define LEDC_TARGET_DUTY 2200
+#define LEDC_TARGET_DUTY 2500//2200
 
 OneButton button = OneButton(
-  1,
+  BUTTON_PIN,
   true);
 
 int brights[8] = { 10, 50, 80, 100, 80, 50, 10, 0 };
@@ -26,6 +26,7 @@ int d_year;
 byte d_month, d_day, t_hour, t_minute, t_second;
 
 void setup() {
+
   Serial.begin(115200);
   while (!Serial) delay(10);
 
@@ -44,6 +45,8 @@ void setup() {
 
   ledcAttach(LED_PIN, LEDC_BASE_FREQ, LEDC_TIMER_12_BIT);
   analogWrite(LED_PIN, 0);
+  
+  pinMode(LED_IND_PIN, OUTPUT);
   button.attachClick(singleClick);
   button.attachLongPressStop(longClick);
 
@@ -55,10 +58,13 @@ void setup() {
   current_mode = mode;
 
   ledcFade(LED_PIN, 0, target_duty, 3000);
+
 }
 
 void loop() {
+
   serialEvent();
+
   button.tick();
 
   Serial.println(rtc.getDateString() + " - " + rtc.getTimeString());
@@ -76,27 +82,40 @@ void loop() {
     if (mode != current_mode) {
       make_fade(mode);
     }
+    digitalWrite(LED_IND_PIN, 1);
+  } else {
+    digitalWrite(LED_IND_PIN, 0);
   }
+
   if (stringComplete) {
     handle_serial_command();
   }
+
   delay(10);
+
 }
 
 void make_fade(int mode) {
+
   // считаем конечную скважность
   int target_duty = get_target_duty(mode);
+  
   // считаем время перехода. для граничных время 15 минут, между по 3 минуты
   int fade_time = get_fade_time(mode);
+  
   // делаем фэйд
   ledcFade(LED_PIN, current_duty, target_duty, fade_time);
+
   // сохраняем текущую скважность
   current_duty = target_duty;
+
   // устанавливаем новый режим
   current_mode = mode;
+
 }
 
 int get_current_mode() {
+
   int hour = rtc.getHours();
   int mode = 8;
 
@@ -119,17 +138,21 @@ int get_current_mode() {
   }
 
   return mode;
+
 }
 
 int get_target_duty(int mode) {
+
   return int(LEDC_TARGET_DUTY * brights[mode - 1] / 100);
 }
 
 int get_fade_time(int mode) {
+
   return ((mode == 1 or mode == 8) ? fade_times[0] : fade_times[1]) * 1000 * 60;  //* 60 для минут
 }
 
 void serialEvent() {
+  
   while (Serial.available()) {
     // get the new byte.
     char inChar = (char)Serial.read();
@@ -141,6 +164,7 @@ void serialEvent() {
     // add it to the inputString.
     inputString += inChar;
   }
+
 }
 
 String getValue(String data, char separator, int index) {
@@ -159,6 +183,7 @@ String getValue(String data, char separator, int index) {
 }
 
 void handle_serial_command() {
+
   Serial.print("Input String : ");
   Serial.println(inputString);
 
@@ -214,30 +239,39 @@ void handle_serial_command() {
       current_duty = target_duty;
     }
   }
+
   // clear the string:
   inputString = "";
   stringComplete = false;
+
 }
 
 void singleClick() {
+  
   if (!auto_mode) {
+
     if (current_mode == 8) {
       current_mode = 1;
     } else {
       current_mode++;
     }
+
     int target_duty = get_target_duty(current_mode);
     ledcFade(LED_PIN, current_duty, target_duty, 3000);
     current_duty = target_duty;
   }
+
 }
 
 void longClick() {
+  
   if (!auto_mode) {
     current_mode = get_current_mode();
     int target_duty = get_target_duty(current_mode);
     ledcFade(LED_PIN, current_duty, target_duty, 3000);
     current_duty = target_duty;
   }
+
   auto_mode = !auto_mode;
+  
 }
