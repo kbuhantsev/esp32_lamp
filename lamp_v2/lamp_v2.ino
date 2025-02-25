@@ -99,16 +99,12 @@ void make_fade(int mode) {
 
   // считаем конечную скважность
   int target_duty = get_target_duty(mode);
-  
   // считаем время перехода. для граничных время 15 минут, между по 3 минуты
   int fade_time = get_fade_time(mode);
-  
   // делаем фэйд
   ledcFade(LED_PIN, current_duty, target_duty, fade_time);
-
   // сохраняем текущую скважность
   current_duty = target_duty;
-
   // устанавливаем новый режим
   current_mode = mode;
 
@@ -249,13 +245,11 @@ void handle_serial_command() {
 void singleClick() {
   
   if (!auto_mode) {
-
     if (current_mode == 8) {
       current_mode = 1;
     } else {
       current_mode++;
     }
-
     int target_duty = get_target_duty(current_mode);
     ledcFade(LED_PIN, current_duty, target_duty, 3000);
     current_duty = target_duty;
