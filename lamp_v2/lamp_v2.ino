@@ -40,8 +40,7 @@ void setup() {
 
   if (rtc.lostPower()) {  // выполнится при сбросе батарейки
     Serial.println("lost power!");
-    //rtc.setTime(COMPILE_TIME);
-    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+    rtc.setTime(COMPILE_TIME);
   }
 
   ledcAttach(LED_PIN, LEDC_BASE_FREQ, LEDC_TIMER_12_BIT);
