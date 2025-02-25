@@ -1,19 +1,22 @@
 #include <microDS3231.h>
 #include <Arduino.h>
 #include <OneButton.h>
+#include <GTimer.h>
 
 #define LEDC_TIMER_12_BIT 12
 #define LEDC_BASE_FREQ 5000
 #define LED_PIN 0
 #define BUTTON_PIN 1
 #define LED_IND_PIN 2
-#define LEDC_TARGET_DUTY 2500 //2200
+#define LEDC_TARGET_DUTY 2300  //2200
 
 MicroDS3231 rtc;
 
 OneButton button = OneButton(
   BUTTON_PIN,
   true);
+
+GTimerCb<millis> serial_timer;  
 
 int brights[8] = { 10, 50, 80, 100, 80, 50, 10, 0 };
 int fade_times[2] = { 15, 3 };
@@ -45,7 +48,7 @@ void setup() {
 
   ledcAttach(LED_PIN, LEDC_BASE_FREQ, LEDC_TIMER_12_BIT);
   analogWrite(LED_PIN, 0);
-  
+
   pinMode(LED_IND_PIN, OUTPUT);
   button.attachClick(singleClick);
   button.attachLongPressStop(longClick);
@@ -58,22 +61,25 @@ void setup() {
   current_mode = mode;
 
   ledcFade(LED_PIN, 0, target_duty, 3000);
+
+  serial_timer.startInterval(1000, []() {
+    Serial.println(rtc.getDateString() + " - " + rtc.getTimeString());
+    Serial.print("current_duty: ");
+    Serial.println(current_duty);
+    Serial.print("current_mode: ");
+    Serial.print(current_mode);
+    Serial.print(" -> ");
+    Serial.print(brights[current_mode - 1]);
+    Serial.println("%");
+  });
+
 }
 
 void loop() {
   serialEvent();
 
   button.tick();
-
-  Serial.println(rtc.getDateString() + " - " + rtc.getTimeString());
-
-  Serial.print("current_duty: ");
-  Serial.println(current_duty);
-  Serial.print("current_mode: ");
-  Serial.print(current_mode);
-  Serial.print(" -> ");
-  Serial.print(brights[current_mode - 1]);
-  Serial.println("%");
+  serial_timer.tick();
 
   if (auto_mode) {
     int mode = get_current_mode();
@@ -115,15 +121,15 @@ int get_current_mode() {
     mode = 2;  // 50%
   } else if (hour >= 10 && hour < 12) {
     mode = 3;  // 80%
-  } else if (hour >= 12 && hour < 14) {
+  } else if (hour >= 12 && hour < 18) {
     mode = 4;  // 100%
-  } else if (hour >= 14 && hour < 16) {
-    mode = 5;  // 80%
-  } else if (hour >= 16 && hour < 18) {
-    mode = 6;  // 50%
   } else if (hour >= 18 && hour < 20) {
+    mode = 5;  // 80%
+  } else if (hour >= 20 && hour < 21) {
+    mode = 6;  // 50%
+  } else if (hour >= 21 && hour < 22) {
     mode = 7;  // 10%
-  } else {     // Все остальное время (20-6)
+  } else {     // Все остальное время (22-6)
     mode = 8;  // 0%
   }
 
