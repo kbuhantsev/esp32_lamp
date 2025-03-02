@@ -8,7 +8,7 @@
 #define LED_PIN 0
 #define BUTTON_PIN 1
 #define LED_IND_PIN 2
-#define LEDC_TARGET_DUTY 2300  //2200
+#define LEDC_TARGET_DUTY 2000  //2200
 
 MicroDS3231 rtc;
 
@@ -115,13 +115,13 @@ int get_current_mode() {
   int hour = rtc.getHours();
   int mode = 8;
 
-  if (hour >= 6 && hour < 8) {
+  if (hour >= 7 && hour < 8) {
     mode = 1;  // 10%
-  } else if (hour >= 8 && hour < 10) {
+  } else if (hour >= 8 && hour < 9) {
     mode = 2;  // 50%
-  } else if (hour >= 10 && hour < 12) {
+  } else if (hour >= 9 && hour < 10) {
     mode = 3;  // 80%
-  } else if (hour >= 12 && hour < 18) {
+  } else if (hour >= 10 && hour < 18) {
     mode = 4;  // 100%
   } else if (hour >= 18 && hour < 20) {
     mode = 5;  // 80%
