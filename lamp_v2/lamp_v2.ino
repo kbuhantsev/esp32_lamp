@@ -8,7 +8,7 @@
 #define LED_PIN 0
 #define BUTTON_PIN 1
 #define LED_IND_PIN 2
-#define LEDC_TARGET_DUTY 2000  //2200
+#define LEDC_TARGET_DUTY 2200  //2200
 
 MicroDS3231 rtc;
 
@@ -121,9 +121,9 @@ int get_current_mode() {
     mode = 2;  // 50%
   } else if (hour >= 9 && hour < 10) {
     mode = 3;  // 80%
-  } else if (hour >= 10 && hour < 18) {
+  } else if (hour >= 10 && hour < 19) {
     mode = 4;  // 100%
-  } else if (hour >= 18 && hour < 20) {
+  } else if (hour >= 19 && hour < 20) {
     mode = 5;  // 80%
   } else if (hour >= 20 && hour < 21) {
     mode = 6;  // 50%
