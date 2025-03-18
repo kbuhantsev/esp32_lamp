@@ -39,7 +39,7 @@ byte d_month, d_day, t_hour, t_minute, t_second;
 
 void setup() {
   Serial.begin(115200);
-  while (!Serial) delay(10);
+  //while (!Serial) delay(10);
 
   inputString.reserve(200);
 
