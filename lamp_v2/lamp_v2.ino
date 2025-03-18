@@ -79,7 +79,7 @@ void setup() {
     conn_count++;
     delay(1000);
     Serial.print(".");
-    if (conn_count == 50) {
+    if (conn_count == 20) {
       break;
     }
   }
