@@ -153,15 +153,15 @@ int get_current_mode() {
   int hour = rtc.getHours();
   int mode = 8;
 
-  if (hour >= 6 && hour < 8) {
+  if (hour >= 7 && hour < 8) {
     mode = 1;  // 10%
-  } else if (hour >= 8 && hour < 10) {
+  } else if (hour >= 8 && hour < 9) {
     mode = 2;  // 50%
-  } else if (hour >= 10 && hour < 12) {
+  } else if (hour >= 9 && hour < 10) {
     mode = 3;  // 80%
-  } else if (hour >= 12 && hour < 18) {
+  } else if (hour >= 10 && hour < 19) {
     mode = 4;  // 100%
-  } else if (hour >= 18 && hour < 20) {
+  } else if (hour >= 19 && hour < 20) {
     mode = 5;  // 80%
   } else if (hour >= 20 && hour < 21) {
     mode = 6;  // 50%
