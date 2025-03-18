@@ -14,8 +14,8 @@
 #define LEDC_TARGET_DUTY 2300  //2200
 #define DEBUG 1
 
-const char* ssid = "STVOL_OFFICE";
-const char* password = "stvolodessa";
+const char* ssid = "TP-Link_C5_Pro";
+const char* password = "AsdQwe12345";
 
 MicroDS3231 rtc;
 
@@ -24,7 +24,7 @@ OneButton button = OneButton(
   true);
 
 GTimerCb<millis> serial_timer;
-GTimerCb<millis> ntp_timer;  
+GTimerCb<millis> ntp_timer;
 
 int brights[8] = { 10, 50, 80, 100, 80, 50, 10, 0 };
 int fade_times[2] = { 15, 3 };
@@ -73,23 +73,36 @@ void setup() {
   WiFi.begin(ssid, password);
   WiFi.setAutoReconnect(true);
   WiFi.persistent(true);
-  
+
+  int conn_count = 0;
   while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
+    conn_count++;
+    delay(1000);
     Serial.print(".");
+    if (conn_count == 50) {
+      break;
+    }
   }
-  
-  Serial.println("WiFi connected.");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
 
-  NTP.begin(2);          // запустить и указать часовой пояс
-  NTP.setPeriod(3600);  // период синхронизации в секундах
-  if (NTP.updateNow()) {
-    rtc.setTime(NTP.second(), NTP.minute(), NTP.hour(), NTP.day(), NTP.month(), NTP.year());
-  } 
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.println("WiFi connected.");
+    Serial.println("IP address: ");
+    Serial.println(WiFi.localIP());
 
-#if (DEBUG == 1)  
+    NTP.begin(2);         // запустить и указать часовой пояс
+    NTP.setPeriod(3600);  // период синхронизации в секундах
+    if (NTP.updateNow()) {
+      rtc.setTime(NTP.second(), NTP.minute(), NTP.hour(), NTP.day(), NTP.month(), NTP.year());
+    }
+
+    ntp_timer.startInterval(43200, []() {  // 12 часов
+      if (NTP.updateNow()) {
+        rtc.setTime(NTP.second(), NTP.minute(), NTP.hour(), NTP.day(), NTP.month(), NTP.year());
+      }
+    });
+  }
+
+#if (DEBUG == 1)
   serial_timer.startInterval(1000, []() {
     Serial.println(rtc.getDateString() + " - " + rtc.getTimeString());
     Serial.print("current_duty: ");
@@ -101,13 +114,6 @@ void setup() {
     Serial.println("%");
   });
 #endif
-
-  ntp_timer.startInterval(43200, []() { // 12 часов
-    if (NTP.updateNow()) {
-      rtc.setTime(NTP.second(), NTP.minute(), NTP.hour(), NTP.day(), NTP.month(), NTP.year());
-    }  
-  });  
-
 }
 
 void loop() {
@@ -115,7 +121,7 @@ void loop() {
   button.tick();
   ntp_timer.tick();
 
-#if (DEBUG == 1) 
+#if (DEBUG == 1)
   serialEvent();
   serial_timer.tick();
   if (stringComplete) {
