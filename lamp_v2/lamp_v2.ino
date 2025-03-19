@@ -38,8 +38,11 @@ int d_year;
 byte d_month, d_day, t_hour, t_minute, t_second;
 
 void setup() {
+  
+#if (DEBUG == 1)  
   Serial.begin(115200);
-  //while (!Serial) delay(10);
+  while (!Serial) delay(10);
+#endif
 
   inputString.reserve(200);
 
@@ -79,7 +82,7 @@ void setup() {
     conn_count++;
     delay(1000);
     Serial.print(".");
-    if (conn_count == 20) {
+    if (conn_count == 30) {
       break;
     }
   }
