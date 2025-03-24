@@ -41,7 +41,7 @@ void setup() {
   
 #if (DEBUG == 1)  
   Serial.begin(115200);
-  while (!Serial) delay(10);
+  delay(1000);
 #endif
 
   inputString.reserve(200);
