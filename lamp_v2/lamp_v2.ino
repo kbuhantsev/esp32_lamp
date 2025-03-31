@@ -23,7 +23,6 @@ OneButton button = OneButton(
   true);
 
 GTimerCb<millis> serial_timer;
-GTimerCb<millis> ntp_timer;
 
 int brights[8] = { 10, 50, 80, 100, 80, 50, 10, 0 };
 int fade_times[2] = { 15, 3 };
@@ -77,7 +76,10 @@ void setup() {
   int conn_count = 0;
   while (WiFi.status() != WL_CONNECTED) {
     conn_count++;
-    delay(1000);
+    digitalWrite(LED_IND_PIN, HIGH);
+    delay(500);
+    digitalWrite(LED_IND_PIN, LOW);
+    delay(500);
     Serial.print(".");
     if (conn_count == 60) {
       break;
@@ -94,12 +96,6 @@ void setup() {
     if (NTP.updateNow()) {
       rtc.setTime(NTP.second(), NTP.minute(), NTP.hour(), NTP.day(), NTP.month(), NTP.year());
     }
-
-    ntp_timer.startInterval(43200, []() {  // 12 часов
-      if (NTP.updateNow()) {
-        rtc.setTime(NTP.second(), NTP.minute(), NTP.hour(), NTP.day(), NTP.month(), NTP.year());
-      }
-    });
   }
 
   serial_timer.startInterval(1000, []() {
@@ -131,9 +127,9 @@ void loop() {
     if (mode != current_mode) {
       make_fade(mode);
     }
-    digitalWrite(LED_IND_PIN, 1);
+    digitalWrite(LED_IND_PIN, HIGH);
   } else {
-    digitalWrite(LED_IND_PIN, 0);
+    digitalWrite(LED_IND_PIN, LOW);
   }
 
   delay(10);
