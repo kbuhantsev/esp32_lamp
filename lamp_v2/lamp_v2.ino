@@ -45,7 +45,10 @@ void setup() {
   if (!rtc.begin()) {
     Serial.println("DS3231 not found");
     for (;;)
-      ;
+      digitalWrite(LED_IND_PIN, HIGH);
+      delay(250);
+      digitalWrite(LED_IND_PIN, LOW);
+      delay(250);
   }
 
   if (rtc.lostPower()) {  // выполнится при сбросе батарейки
