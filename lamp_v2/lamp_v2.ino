@@ -117,7 +117,7 @@ void setup() {
 void loop() {
 
   button.tick();
-  ntp_timer.tick();
+  NTP.tick();
 
   serialEvent();
   serial_timer.tick();
@@ -155,13 +155,13 @@ int get_current_mode() {
   int hour = rtc.getHours();
   int mode = 8;
 
-  if (hour >= 7 && hour < 8) {
+  if (hour >= 8 && hour < 9) {
     mode = 1;  // 10%
-  } else if (hour >= 8 && hour < 9) {
-    mode = 2;  // 50%
   } else if (hour >= 9 && hour < 10) {
+    mode = 2;  // 50%
+  } else if (hour >= 10 && hour < 11) {
     mode = 3;  // 80%
-  } else if (hour >= 10 && hour < 19) {
+  } else if (hour >= 11 && hour < 19) {
     mode = 4;  // 100%
   } else if (hour >= 19 && hour < 20) {
     mode = 5;  // 80%
