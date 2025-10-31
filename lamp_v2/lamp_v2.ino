@@ -95,7 +95,7 @@ void setup() {
     Serial.println("IP address: ");
     Serial.println(WiFi.localIP());
 
-    NTP.begin(3);         // запустить и указать часовой пояс
+    NTP.begin(2);         // запустить и указать часовой пояс
     NTP.setPeriod(3600);  // период синхронизации в секундах
     if (NTP.updateNow()) {
       rtc.setTime(NTP.second(), NTP.minute(), NTP.hour(), NTP.day(), NTP.month(), NTP.year());
