@@ -52,10 +52,10 @@ void setup() {
     }
   }
 
-  if (rtc.lostPower()) {  // выполнится при сбросе батарейки
-    Serial.println("lost power!");
-    rtc.setTime(COMPILE_TIME);
-  }
+  //if (rtc.lostPower()) {  // выполнится при сбросе батарейки
+  //  Serial.println("lost power!");
+  //  rtc.setTime(COMPILE_TIME);
+  //}
 
   ledcAttach(LED_PIN, LEDC_BASE_FREQ, LEDC_TIMER_12_BIT);
   analogWrite(LED_PIN, 0);
